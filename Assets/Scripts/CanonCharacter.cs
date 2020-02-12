@@ -23,6 +23,11 @@ public class CanonCharacter : MonoBehaviour
     [SerializeField]
     Image imageOverheating = null;
 
+    [SerializeField]
+    LineRenderer lineRenderer = null;
+
+    Vector3 mousePositionInWorld;
+
     /// <summary>
     /// This value is between 0.0 (0%) and 1.0 (100%)
     /// </summary>
@@ -44,6 +49,7 @@ public class CanonCharacter : MonoBehaviour
     private void Reset()
     {
         playerCamera = Camera.main;
+        lineRenderer = GetComponent<LineRenderer>();
     }
 
     // Start is called before the first frame update
@@ -64,6 +70,9 @@ public class CanonCharacter : MonoBehaviour
         }
 
         canShoot = false;
+        lineRenderer.enabled = false;
+        lineRenderer.startWidth = 0.1f;
+        lineRenderer.endWidth = 0.15f;
     }
 
     // Update is called once per frame
@@ -78,11 +87,11 @@ public class CanonCharacter : MonoBehaviour
 
     void ViewFollowMousePosition()
     {
-        Vector3 mousePosition = (Vector2)playerCamera.ScreenToWorldPoint(Input.mousePosition);
+        mousePositionInWorld = (Vector2)playerCamera.ScreenToWorldPoint(Input.mousePosition);
 
-        if (mousePosition.y > transform.position.y + 0.3f)
+        if (mousePositionInWorld.y > transform.position.y + 0.3f)
         {
-            transform.rotation = Quaternion.FromToRotation(Vector3.up, mousePosition - transform.position);
+            transform.rotation = Quaternion.FromToRotation(Vector3.up, mousePositionInWorld - transform.position);
         }
     }
 
@@ -103,12 +112,29 @@ public class CanonCharacter : MonoBehaviour
             if (OnCanonAimStart != null)
             {
                 OnCanonAimStart.Invoke();
+                lineRenderer.enabled = true;
             }
         }
 
         if (Input.GetMouseButton(0))
         {
             ViewFollowMousePosition();
+
+            if (mousePositionInWorld.y > transform.position.y + 0.3f)
+            {
+                lineRenderer.SetPosition(0, transform.position);
+
+                int layerMask = ~(1 << LayerMask.NameToLayer("BlockZone") | 1 << LayerMask.NameToLayer("Projectile"));
+
+                // Cast a ray straight down.
+                RaycastHit2D hit = Physics2D.Raycast(transform.position, (mousePositionInWorld - transform.position), 1000.0f, layerMask);
+
+                // If it hits something...
+                if (hit.collider != null)
+                {
+                    lineRenderer.SetPosition(1, hit.point);
+                }
+            }
 
             canShoot = true;
         }
@@ -131,6 +157,8 @@ public class CanonCharacter : MonoBehaviour
                     OnCanonShoot.Invoke();
                 }
             }
+
+            lineRenderer.enabled = false;
         }
 
         weaponOverheating -= 0.1f * Time.deltaTime;

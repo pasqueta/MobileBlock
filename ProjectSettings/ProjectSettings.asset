@@ -714,6 +714,10 @@ PlayerSettings:
       daydreamIconForeground: {fileID: 0}
       daydreamIconBackground: {fileID: 0}
   cloudServicesEnabled:
+    Build: 0
+    Collab: 0
+    ErrorHub: 0
+    Hub: 0
     UNet: 1
   luminIcon:
     m_Name: 
@@ -727,10 +731,10 @@ PlayerSettings:
     m_VersionCode: 1
     m_VersionName: 
   apiCompatibilityLevel: 6
-  cloudProjectId: 
+  cloudProjectId: 66f1b256-1dca-4f35-865f-b2a2db50e28d
   framebufferDepthMemorylessMode: 0
-  projectName: 
-  organizationId: 
+  projectName: MobileBlock
+  organizationId: alexis-pasquet
   cloudEnabled: 0
   enableNativePlatformBackendsForNewInputSystem: 0
   disableOldInputManagerSupport: 0
